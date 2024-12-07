@@ -25,9 +25,19 @@
       padding: 10px;
       width: 200px;
     }
+    #nombre {
+      width: 150px;
+    }
+    #nombre_texto {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
+  <div>
+    <h3 id="nombre_texto">Tu nombre: </h3>
+    <input type="text" id="nombre" placeholder="Escribe un nombre...">
+  </div>
   <h2>Chat Grupal</h2>
   <div id="chat"></div>
   <input type="text" id="message" placeholder="Escribe un mensaje...">
@@ -43,6 +53,7 @@
     const chat = document.getElementById('chat');
     const messageInput = document.getElementById('message');
     const sendButton = document.getElementById('send');
+    const nombre = document.getElementById('nombre');
 
     // Cuando se recibe un mensaje
     socket.onmessage = function(event) {
@@ -51,16 +62,19 @@
       if (typeof message !== 'string') {
         message = new TextDecoder('utf-8').decode(message);
       }
+      const parsedMessage = JSON.parse(message);
       const newMessage = document.createElement('div');
-      newMessage.textContent = message; // Mostrar el mensaje en el chat
+      newMessage.textContent = parsedMessage.user + ': ' + parsedMessage.text; // Mostrar el mensaje en el chat
       chat.appendChild(newMessage);
       chat.scrollTop = chat.scrollHeight;
     };
 
     // Enviar mensaje al servidor
     sendButton.addEventListener('click', () => {
-      const message = messageInput.value; // Obtener texto del input
-      if (message) {
+      const text = messageInput.value; // Obtener texto del input
+      const user = nombre.value;
+      if (text && user) {
+        const message = JSON.stringify({user, text});
         socket.send(message); // Enviar mensaje al servidor
         messageInput.value = ''; // Limpiar input
       }

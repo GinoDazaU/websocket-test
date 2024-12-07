@@ -11,8 +11,10 @@ server.on('connection', (socket) => {
   // Recibir mensajes de los clientes
   socket.on('message', (message) => {
     console.log(`Mensaje recibido: ${message}`);
+    const {user, text} = JSON.parse(message);
     // Convertir el mensaje a texto antes de enviarlo a otros clientes
-    const textMessage = Buffer.from(message, 'utf-8').toString('utf-8');
+    const textMessage = JSON.stringify({user, text});
+
     server.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(textMessage); // Asegurar que el mensaje sea texto
