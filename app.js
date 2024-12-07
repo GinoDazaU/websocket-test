@@ -22,16 +22,6 @@ server.on('connection', (socket) => {
     });
   });
 
-  socket.on('playerUpdate', (playerUpdate) => {
-    server.clients.forEach((client) => {
-      console.log(`PlayerUpdate recibido: ${playerUpdate}`);
-
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(playerUpdate);
-      }
-    });
-  });
-
   // Manejar la desconexión del cliente
   socket.on('close', () => {
     console.log('Cliente desconectado');
