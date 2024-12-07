@@ -32,7 +32,6 @@
   <script>
     // Conectar al servidor WebSocket
     const socket = new WebSocket('ws://34.194.232.205:8080');
-    socket.binaryType = 'string'; // Forzar la recepción como texto
 
     // Referencias al DOM
     const chat = document.getElementById('chat');
@@ -41,9 +40,13 @@
 
     // Cuando se recibe un mensaje
     socket.onmessage = function(event) {
-      const message = event.data; // Recibe texto enviado por el servidor
+      let message = event.data; // Recibe datos del servidor
+      // Asegurarse de interpretar como texto
+      if (typeof message !== 'string') {
+        message = new TextDecoder('utf-8').decode(message);
+      }
       const newMessage = document.createElement('div');
-      newMessage.textContent = message; // Muestra el mensaje en el chat
+      newMessage.textContent = message; // Mostrar el mensaje en el chat
       chat.appendChild(newMessage);
       chat.scrollTop = chat.scrollHeight;
     };
