@@ -1,34 +1,26 @@
 const WebSocket = require('ws');
-const http = require('http');
 
-// Crear un servidor HTTP para servir archivos estáticos
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end('<h1>Servidor WebSocket corriendo en EC2</h1>');
-});
+const port = 8080; // Puerto en el que el servidor WebSocket escuchará
+const server = new WebSocket.Server({ port });
 
-// Crear un servidor WebSocket en el puerto 8080
-const wss = new WebSocket.Server({ server });
+console.log(`Servidor WebSocket escuchando en el puerto ${port}`);
 
-wss.on('connection', (ws) => {
+server.on('connection', (socket) => {
   console.log('Nuevo cliente conectado');
-  ws.send('¡Bienvenido al chat grupal!');
 
-  ws.on('message', (message) => {
-    console.log('Mensaje recibido: %s', message);
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
+  // Recibir mensajes de los clientes
+  socket.on('message', (message) => {
+    console.log(`Mensaje recibido: ${message}`);
+    // Reenviar el mensaje a todos los clientes conectados
+    server.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
     });
   });
 
-  ws.on('close', () => {
+  // Manejar la desconexión del cliente
+  socket.on('close', () => {
     console.log('Cliente desconectado');
   });
-});
-
-// Iniciar el servidor en el puerto 8080
-server.listen(8080, '0.0.0.0', () => {
-  console.log('Servidor WebSocket escuchando en ws://0.0.0.0:8080');
 });
