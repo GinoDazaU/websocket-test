@@ -40,19 +40,19 @@
 
     // Cuando se recibe un mensaje
     socket.onmessage = function(event) {
-      const message = event.data;
+      const message = event.data; // Recibe texto enviado por el servidor
       const newMessage = document.createElement('div');
-      newMessage.textContent = message;
+      newMessage.textContent = message; // Muestra el mensaje en el chat
       chat.appendChild(newMessage);
       chat.scrollTop = chat.scrollHeight;
     };
 
-    // Enviar mensaje
+    // Enviar mensaje al servidor
     sendButton.addEventListener('click', () => {
-      const message = messageInput.value;
+      const message = messageInput.value; // Obtener texto del input
       if (message) {
-        socket.send(message);
-        messageInput.value = '';
+        socket.send(message); // Enviar mensaje al servidor
+        messageInput.value = ''; // Limpiar input
       }
     });
 
