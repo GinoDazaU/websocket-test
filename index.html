@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Grupal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #chat {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      overflow-y: scroll;
+    }
+    #message {
+      width: 240px;
+    }
+    #send {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Chat Grupal</h2>
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Escribe un mensaje...">
+  <button id="send">Enviar</button>
+
+  <script>
+    // Conectar al servidor WebSocket
+    const socket = new WebSocket('ws://localhost:8080');
+
+    // Referencias al DOM
+    const chat = document.getElementById('chat');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+
+    // Cuando se recibe un mensaje
+    socket.onmessage = function(event) {
+      const message = event.data;
+      const newMessage = document.createElement('div');
+      newMessage.textContent = message;
+      chat.appendChild(newMessage);
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    // Enviar mensaje
+    sendButton.addEventListener('click', () => {
+      const message = messageInput.value;
+      if (message) {
+        socket.send(message);
+        messageInput.value = '';
+      }
+    });
+
+    // También enviar mensaje con "Enter"
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+  </script>
+</body>
+</html>
