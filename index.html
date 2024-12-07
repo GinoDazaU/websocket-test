@@ -21,6 +21,10 @@
     #send {
       padding: 10px;
     }
+    #gato {
+      padding: 10px;
+      width: 200px;
+    }
   </style>
 </head>
 <body>
@@ -28,7 +32,9 @@
   <div id="chat"></div>
   <input type="text" id="message" placeholder="Escribe un mensaje...">
   <button id="send">Enviar</button>
-
+  <div>
+    <img id="gato" src="https://media1.tenor.com/m/DM7SdBiQKhEAAAAd/cat-underwater.gif"/>
+  </div>
   <script>
     // Conectar al servidor WebSocket
     const socket = new WebSocket('ws://34.194.232.205:8080');
