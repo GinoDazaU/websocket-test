@@ -11,13 +11,23 @@ server.on('connection', (socket) => {
   // Recibir mensajes de los clientes
   socket.on('message', (message) => {
     console.log(`Mensaje recibido: ${message}`);
-    const {user, text} = JSON.parse(message);
+    const parsedMessage = JSON.parse(message);
     // Convertir el mensaje a texto antes de enviarlo a otros clientes
-    const textMessage = JSON.stringify({user, text});
+    const messageToSend = JSON.stringify(parsedMessage);
 
     server.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(textMessage); // Asegurar que el mensaje sea texto
+        client.send(messageToSend); // Asegurar que el mensaje sea texto
+      }
+    });
+  });
+
+  socket.on('playerUpdate', (playerUpdate) => {
+    server.clients.forEach((client) => {
+      console.log(`PlayerUpdate recibido: ${playerUpdate}`);
+
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(playerUpdate);
       }
     });
   });
