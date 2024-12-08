@@ -52,6 +52,13 @@
     #playername {
       position: absolute;
     }
+    .arrow {
+      width: 50px;
+      height: 50px;
+      margin-left: 10px;
+      margin-right: 10px;
+      font-size: 25px;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuid.min.js"></script>
 </head>
@@ -72,7 +79,7 @@
     </div>
     <div>
       <div>
-        <p>Muévete con las flechas y envía mensajes por el chat (debes ponerte un nombre para poder enviar mensajes)</p>
+        <p>Muévete con las flechas del teclado y envía mensajes por el chat (debes ponerte un nombre para poder enviar mensajes)</p>
       </div>
       <div id="pantalla">
         <div id="player"></div>
@@ -80,6 +87,12 @@
       </div>
       <h3>Jugadores:</h2>
       <p id="playerlist"></p>
+      <div>
+        <button id="larr" class="arrow">&larr;</button>
+        <button id="uarr" class="arrow">&uarr;</button>
+        <button id="darr" class="arrow">&darr;</button>
+        <button id="rarr" class="arrow">&rarr;</button>
+      </div>
     </div>
   </div>
 
@@ -102,6 +115,10 @@
     const pantalla = document.getElementById('pantalla');
     const playername = document.getElementById('playername');
     const playerlist = document.getElementById('playerlist');
+    const larr = document.getElementById('larr');
+    const rarr = document.getElementById('rarr');
+    const uarr = document.getElementById('uarr');
+    const darr = document.getElementById('darr');
 
     if(!nombre.value) {
       playername.textContent = "noName";
@@ -310,6 +327,47 @@
       socket.send(data);
       sendPlayerPos();
     }
+
+    uarr.addEventListener('click', () => {
+      const playerRect = player.getBoundingClientRect();
+      posY -= 20;
+      if(posY < 0) {
+        posY = 0;
+        
+      }
+      updateScreen();
+      sendPlayerPos();
+    });
+
+    darr.addEventListener('click', () => {
+      const playerRect = player.getBoundingClientRect();
+      posY += 20;
+      if(posY + playerRect.height > 500) {
+        posY = 500 - playerRect.height;
+      }
+      updateScreen();
+      sendPlayerPos();
+    });
+
+    larr.addEventListener('click', () => {
+      const playerRect = player.getBoundingClientRect();
+      posX -= 20;
+      if(posX < 0) {
+        posX = 0;
+      }
+      updateScreen();
+      sendPlayerPos();
+    });
+
+    rarr.addEventListener('click', () => {
+      const playerRect = player.getBoundingClientRect();
+      posX += 20;
+      if(posX + playerRect.width > 1000) {
+        posX = 1000 - playerRect.width; 
+      }
+      updateScreen();
+      sendPlayerPos();
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key in keysPressed) {
