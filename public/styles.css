@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+  }
+  #chat {
+    width: 300px;
+    height: 300px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    overflow-y: scroll;
+  }
+  #message {
+    width: 240px;
+  }
+  #send {
+    padding: 10px;
+  }
+  #gato {
+    padding: 10px;
+    width: 180px;
+  }
+  #nombre {
+    width: 150px;
+  }
+  #nombre_texto {
+    margin-bottom: 5px;
+  }
+  #pantalla {
+    width: 1000px;
+    height: 500px;
+    border: 1px solid #000000;
+    margin-left: 50px;
+  }
+  #principal {
+    display: flex;
+    flex: auto;
+    flex-direction: row;
+  }
+  #player {
+    width: 10px;
+    height: 10px;
+    background-color: #00ffff;
+    border-radius: 100%;
+    position: absolute;
+  }
+  #playername {
+    position: absolute;
+  }
+  .arrow {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 25px;
+  }
