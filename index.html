@@ -122,7 +122,12 @@
 
       if(parsedMessage.type == "message") {
         const newMessage = document.createElement('div');
-        newMessage.textContent = parsedMessage.user + ': ' + parsedMessage.text; // Mostrar el mensaje en el chat
+        // Formatear el mensaje usando innerHTML
+        newMessage.innerHTML = `
+            <span style="color: gray;">[${parsedMessage.time}]</span> 
+            <strong>${parsedMessage.user}:</strong> 
+            <span>${parsedMessage.text}</span>
+        `;
         chat.appendChild(newMessage);
         chat.scrollTop = chat.scrollHeight;
       } else if(parsedMessage.type == "playerUpdate" && parsedMessage.playerUUID != playerUUID) {
@@ -213,8 +218,16 @@
       const text = messageInput.value; // Obtener texto del input
       const user = nombre.value;
       const type = 'message';
+      const date = new Date();
+
+      const utc5Hours = (date.getUTCHours() - 5 + 24) % 24;
+      const minutes = date.getUTCMinutes();
+      const seconds = date.getUTCSeconds();
+
+      const time = `${utc5Hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
       if (text && user) {
-        const message = JSON.stringify({type, user, text});
+        const message = JSON.stringify({type, user, text, time});
         socket.send(message); // Enviar mensaje al servidor
         messageInput.value = ''; // Limpiar input
       }
