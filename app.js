@@ -5,9 +5,10 @@ const server = new WebSocket.Server({ port });
 
 console.log(`Servidor WebSocket escuchando en el puerto ${port}`);
 
+const playerData = new Map();
+
 server.on('connection', (socket) => {
   console.log('Nuevo cliente conectado');
-  console.log(socket);
   let playerUUID;
 
   // Recibir mensajes de los clientes
@@ -15,8 +16,13 @@ server.on('connection', (socket) => {
     console.log(`Mensaje recibido: ${message}`);
     const parsedMessage = JSON.parse(message);
 
-    if(parsedMessage.type == "playerUpdate") {
+    if(parsedMessage.type == "open") {
       playerUUID = parsedMessage.playerUUID;
+      playerData.set(playerUUID, {});
+      socket.send(JSON.stringify({type: "open", playerData: Array.from(playerData)}));
+      
+    } else if(parsedMessage.type == "playerUpdate") {
+      playerData.set(playerUUID, {user: parsedMessage.user, posX: parsedMessage.posX, posY: parsedMessage.posY});
     }
 
     // Convertir el mensaje a texto antes de enviarlo a otros clientes
@@ -32,6 +38,7 @@ server.on('connection', (socket) => {
   // Manejar la desconexión del cliente
   socket.on('close', () => {
     console.log('Cliente desconectado');
+    playerData.delete(playerUUID);
     const type = "close";
     const closeData = JSON.stringify({type, playerUUID});
     server.clients.forEach((client) => {

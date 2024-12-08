@@ -75,13 +75,16 @@
         <div id="player"></div>
         <p id="playername">Nombre</p>
       </div>
+      <h3>Jugadores:</h2>
+      <p id="playerlist"></p>
     </div>
   </div>
 
   </div>
   <script>
     // Conectar al servidor WebSocket
-    const socket = new WebSocket('ws://34.194.232.205:8080');
+    const host = '100.27.56.105';
+    const socket = new WebSocket(`ws://${host}:8080`);
 
     // UUID
     const playerUUID = uuid.v4();
@@ -95,6 +98,16 @@
     const player = document.getElementById('player');
     const pantalla = document.getElementById('pantalla');
     const playername = document.getElementById('playername');
+    const playerlist = document.getElementById('playerlist');
+
+    if(!nombre.value) {
+      playername.textContent = "noName";
+    } else {
+      playername.textContent = nombre.value;
+    }
+
+    // Info de jugadores
+    const playerFullInfo = new Map();
 
     // Cuando se recibe un mensaje
     socket.onmessage = function(event) {
@@ -104,12 +117,18 @@
         message = new TextDecoder('utf-8').decode(message);
       }
       const parsedMessage = JSON.parse(message);
+
+      console.log(parsedMessage);
+
       if(parsedMessage.type == "message") {
         const newMessage = document.createElement('div');
         newMessage.textContent = parsedMessage.user + ': ' + parsedMessage.text; // Mostrar el mensaje en el chat
         chat.appendChild(newMessage);
         chat.scrollTop = chat.scrollHeight;
       } else if(parsedMessage.type == "playerUpdate" && parsedMessage.playerUUID != playerUUID) {
+
+        playerFullInfo.set(parsedMessage.playerUUID, {user: parsedMessage.user});
+        updatePlayerList();
 
         const existingPlayerTag = document.querySelector(`.newPlayerTag[data-playeruuid="${parsedMessage.playerUUID}"]`);
         const existingPlayer = document.querySelector(`.newPlayer[data-playeruuid="${parsedMessage.playerUUID}"]`);
@@ -148,6 +167,44 @@
       } else if (parsedMessage.type == "close") {
         document.querySelector(`.newPlayerTag[data-playeruuid="${parsedMessage.playerUUID}"]`).remove();
         document.querySelector(`.newPlayer[data-playeruuid="${parsedMessage.playerUUID}"]`).remove();
+        playerFullInfo.delete(parsedMessage.playerUUID);
+        updatePlayerList();
+      } else if (parsedMessage.type == "open") {
+        const playerData = parsedMessage.playerData;
+        if(!parsedMessage.playerData) {
+          return;
+        }
+        playerData.forEach(data => {
+          if(data[0] == playerUUID) {
+            return;
+          }
+          
+          playerFullInfo.set(data[0], {user: data[1].user});
+
+          const newPlayer = document.createElement('div');
+          newPlayer.style.top = `${pantalla.offsetTop + data[1].posY}px`;
+          newPlayer.style.left = `${pantalla.offsetLeft + data[1].posX}px`;
+          newPlayer.style.width = '10px';
+          newPlayer.style.height = '10px';
+          newPlayer.style.backgroundColor = '#ff0000';
+          newPlayer.style.borderRadius = '100%';
+          newPlayer.style.position = 'absolute';
+
+          newPlayer.setAttribute('data-playeruuid', data[0]);
+          newPlayer.classList.add('newPlayer');
+          pantalla.appendChild(newPlayer);
+
+          const newPlayerTag = document.createElement('p');
+          newPlayerTag.textContent = data[1].user;
+          newPlayerTag.style.top = `${pantalla.offsetTop + data[1].posY - 40}px`;
+          newPlayerTag.style.left = `${pantalla.offsetLeft + data[1].posX - newPlayerTag.offsetWidth / 2 + newPlayer.offsetWidth / 2}px`;
+          newPlayerTag.style.position = 'absolute';
+          
+          newPlayerTag.setAttribute('data-playeruuid', data[0]);
+          newPlayerTag.classList.add('newPlayerTag');
+          pantalla.appendChild(newPlayerTag);
+        });
+        updatePlayerList();
       }
     };
 
@@ -175,7 +232,28 @@
       playername.textContent = nombre.value;
       updateScreen();
       sendPlayerPos();
+      updatePlayerList();
     });
+
+    // Actualizar lista de jugadores
+    const updatePlayerList = () => {
+      const players = Array.from(playerFullInfo.values());
+      const list = new Array();
+      if(nombre.value == '') {
+        list.push("noName");
+      } else {
+        list.push(nombre.value);
+      }
+      players.forEach((player) => {
+        if(player.user == '') {
+          list.push("noName");
+        } else {
+          list.push(player.user);
+        }
+      });
+      const playersAsString = list.join(' | ');
+      playerlist.textContent = playersAsString;
+    }
 
     let moving = false;
 
@@ -210,6 +288,9 @@
     updateScreen();
 
     socket.onopen = function () {
+      const type = "open";
+      const data = JSON.stringify({type, playerUUID});
+      socket.send(data);
       sendPlayerPos();
     }
 
