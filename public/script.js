@@ -1,9 +1,10 @@
+import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
 
 // Conectar al servidor WebSocket
 const socket = new WebSocket(`ws://${CONFIG.host}:${CONFIG.port}`);
 
 // UUID
-const playerUUID = uuid.v4();
+const playerUUID = uuidv4();
 console.log(playerUUID);
 
 // Referencias al DOM
