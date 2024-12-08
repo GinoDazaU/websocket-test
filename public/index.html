@@ -61,6 +61,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuid.min.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
   <div id="principal">
@@ -99,8 +100,7 @@
   </div>
   <script>
     // Conectar al servidor WebSocket
-    const host = '100.27.56.105';
-    const socket = new WebSocket(`ws://${host}:8080`);
+    const socket = new WebSocket(`ws://${CONFIG.host}:${CONFIG.port}`);
 
     // UUID
     const playerUUID = uuid.v4();

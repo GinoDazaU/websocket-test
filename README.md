@@ -5,9 +5,9 @@ Este es un proyecto básico que implementa un chat grupal en tiempo real utiliza
 
 Para actualizar los archivos en la VM:
 
-1. Copia el archivo `index.html` al servidor web:
+1. Copia el contenido de `public/` al servidor web:
    ```bash
-   sudo cp index.html /var/www/html/
+   sudo cp -r public/* /var/www/html/
 2. Ejecuta el servidor WebSocket:
    ```bash
    node app.js
